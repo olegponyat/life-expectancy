@@ -1,50 +1,71 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Define the grid (with 1 as start, 2 as end, 3 as gates, 4 as barriers)
+def visualize_movements(movements, start, grid):
+    x, y = start
+    path_x = [x]
+    path_y = [y]
+
+    move_map = {
+        1: (-2, 0),  # Up
+        2: (0, 2),   # Right
+        3: (2, 0),   # Down
+        4: (0, -2)   # Left
+    }
+
+    for move in movements:
+        dx, dy = move_map[move]
+        x += dx
+        y += dy
+        path_x.append(x)
+        path_y.append(y)
+
+    plt.figure(figsize=(10, 8))
+
+    # Create grid visualization
+    grid_array = np.array(grid)
+    for r in range(len(grid)):
+        for c in range(len(grid[0])):
+            value = grid[r][c]
+            color = 'white'
+            if value == 1:  # Start
+                color = 'green'
+            elif value == 2:  # End
+                color = 'red'
+            elif value == 3:  # Barrier
+                color = 'black'
+            elif value == 4:  # Gate
+                color = 'blue'
+            plt.gca().add_patch(plt.Rectangle((c, r), 1, 1, color=color, ec='gray'))
+
+    # Plot the path
+    plt.plot(path_y, path_x, marker='o', linestyle='-', color='orange', label='Path')
+    plt.scatter(path_y[0], path_x[0], color='green', s=100, label='Start')  # Start point
+    plt.scatter(path_y[-1], path_x[-1], color='red', s=100, label='End')    # End point
+
+    # Format plot
+    plt.grid(True)
+    plt.gca().invert_yaxis()
+    plt.xticks(range(len(grid[0]) + 1))
+    plt.yticks(range(len(grid) + 1))
+    plt.xlabel('Columns')
+    plt.ylabel('Rows')
+    plt.title('Path Visualization with Grid')
+    plt.legend()
+    plt.show()
+
+
+# Example usage
 grid = [
-    [1, 0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 4, 0, 4, 0, 4, 0, 4, 0],
+    [1, 0, 4, 0, 0, 0, 0, 0, 0],
+    [0, 9, 0, 9, 0, 9, 0, 9, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 4, 0, 4, 0, 4, 0, 4, 0],
-    [0, 0, 3, 0, 0, 0, 3, 0, 0],
-    [0, 4, 0, 4, 0, 4, 0, 4, 0],
-    [0, 0, 0, 0, 3, 0, 0, 0, 3],
+    [0, 9, 0, 9, 0, 9, 0, 9, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 9, 0, 9, 0, 9, 0, 9, 0],
+    [0, 0, 4, 0, 0, 0, 4, 0, 2]
 ]
 
-# Set up the figure and axes
-fig, ax = plt.subplots()
-
-# Loop through the grid and draw the actual tiles (even-numbered coordinates)
-for i in range(0, len(grid), 2):
-    for j in range(0, len(grid[0]), 2):
-        if grid[i][j] == 1:  # Start point
-            ax.add_patch(plt.Rectangle((j, i), 2, 2, edgecolor='black', facecolor='green'))
-        elif grid[i][j] == 2:  # End point
-            ax.add_patch(plt.Rectangle((j, i), 2, 2, edgecolor='black', facecolor='red'))
-        elif grid[i][j] == 3:  # Gate
-            ax.add_patch(plt.Rectangle((j, i), 2, 2, edgecolor='black', facecolor='blue'))
-        else:  # Empty tile
-            ax.add_patch(plt.Rectangle((j, i), 2, 2, edgecolor='black', facecolor='white'))
-
-# Draw the barriers as lines between tiles (check odd coordinates for barriers)
-for i in range(1, len(grid), 2):  # Vertical barriers between rows
-    for j in range(0, len(grid[0]), 2):
-        if grid[i][j] == 4:  # Barrier between two rows
-            ax.plot([j, j+2], [i-1, i-1], color='black', linewidth=4)  # Draw horizontal barrier
-
-for i in range(0, len(grid), 2):  # Horizontal barriers between columns
-    for j in range(1, len(grid[0]), 2):
-        if grid[i][j] == 4:  # Barrier between two columns
-            ax.plot([j-1, j-1], [i, i+2], color='black', linewidth=4)  # Draw vertical barrier
-
-# Set axis limits and aspect ratio
-ax.set_xlim(0, 9)
-ax.set_ylim(7, 0)
-ax.set_aspect('equal')
-
-# Hide the axis ticks and labels
-ax.set_xticks([])
-ax.set_yticks([])
-
-plt.show()
+movements = [2, 3, 2, 3, 2, 2, 1]
+start_position = (0, 0)
+visualize_movements(movements, start_position, grid)
